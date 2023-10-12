@@ -27,7 +27,7 @@ export default function Login() {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went wrong", { theme: "dark" });
+        toast.error("Something went wrong", { theme: "light" });
       });
   };
 
