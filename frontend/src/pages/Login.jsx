@@ -7,28 +7,27 @@ import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [user, setUser] = useState({ username: "", password: "" });
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    axios
-      .post("http://localhost:4000/login", {
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post("http://localhost:4000/login", {
         username: user.username,
         password: user.password,
-      })
-      .then((response) => {
-        console.log(response);
-        window.localStorage.setItem("token", response.data.token);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.error("Something went wrong", { theme: "light" });
       });
+
+      console.log(response);
+      window.localStorage.setItem("token", response.data.token);
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong", { theme: "light" });
+    }
   };
 
   return (

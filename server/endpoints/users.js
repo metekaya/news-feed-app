@@ -2,6 +2,7 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Constants } = require("../constants");
+const Preferences = require("../models/preferences");
 
 module.exports = {
   read: async function (req, res) {
@@ -20,6 +21,42 @@ module.exports = {
     const users = await User.findAll();
     console.log(`Returning all users = ${users}`);
     return res.json({ data: users });
+  },
+  readPreferences: async function (req, res) {
+    const userId = req.user.id;
+    try {
+      const userPreferences = await Preferences.findOne({ where: { userId } });
+
+      if (userPreferences) {
+        return res.json(userPreferences.dataValues);
+      } else {
+        return res.status(404).json({ error: "User preferences not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  updatePreferences: async function (req, res) {
+    const userId = req.user.id;
+    const country = req.body.country;
+    const category = req.body.category;
+
+    console.log(`Saving user preferences for user: ${req.user.username}`);
+
+    try {
+      const userPreferences = await Preferences.findOne({ where: { userId } });
+      userPreferences.country = country;
+      userPreferences.category = category;
+
+      await userPreferences.save();
+      console.log("Successfully updated user preferences.");
+
+      return res.json(userPreferences);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
   },
   create: async function (req, res) {
     const username = req.body.username;
@@ -72,9 +109,13 @@ module.exports = {
         return res.status(401).json({ OK: false, message: "Invalid password" });
       }
 
-      const token = jwt.sign({ username: user.username }, Constants.secretKey, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { id: user.id, username: user.username },
+        Constants.secretKey,
+        {
+          expiresIn: "1h",
+        }
+      );
 
       return res.json({ token });
     } catch (error) {

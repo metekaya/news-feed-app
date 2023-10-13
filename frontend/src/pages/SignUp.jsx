@@ -24,7 +24,6 @@ export default function SignUp() {
       return;
     }
     const isPasswordValid = user.password === user.confirm_password;
-    console.log(isPasswordValid);
     if (!isPasswordValid) {
       setIsFormValid(false);
       return;

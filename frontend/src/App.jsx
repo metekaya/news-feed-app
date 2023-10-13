@@ -7,10 +7,10 @@ import PrivateRoutes from "./utils/PrivateRoutes";
 export default function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
       <Route element={<PrivateRoutes />}>
         <Route element={<Home />} path="/" exact></Route>
       </Route>
-      <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
     </Routes>
   );
