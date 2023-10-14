@@ -3,6 +3,8 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
+  CardHeader,
   Divider,
   Image,
   Input,
@@ -14,11 +16,11 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
+import { HiOutlineMagnifyingGlass, HiOutlineNewspaper } from "react-icons/hi2";
 
 import { CiLogout } from "react-icons/ci";
 
-export default function Home() {
+export default function DeprecatedHome() {
   const [newsData, setNewsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -163,39 +165,33 @@ export default function Home() {
   useEffect(() => {
     const updatedTotalPages = calculateTotalPages(filteredNews, itemsPerPage);
     setTotalPages(updatedTotalPages);
-    if (currentPage > updatedTotalPages) {
-      setCurrentPage(1);
-    }
-  }, [searchQuery, filteredNews, itemsPerPage, currentPage]);
+  }, [searchQuery, filteredNews, itemsPerPage]);
 
   return (
-    <div className="h-screen flex flex-col font-spartan">
-      <div className="flex-1 bg-blue-100/60 h-[120px]">
-        <div className="flex justify-between items-center px-2 py-3">
-          <div className="basis-4/12 xl:basis-3/12 2xl:basis-2/12 flex justify-center">
-            <Image width={250} alt="app-logo" src="logo.png" />
-          </div>
+    <div className="h-screen bg-slate-300 flex flex-col font-spartan justify-center items-center text-center">
+      <div className="flex w-full items-center">
+        <div className="flex w-full justify-end">
+          <h1 className="text-5xl font-bold text-white border bg-black p-5 m-10 rounded-lg">
+            Newsio
+          </h1>
+        </div>
+        <div className="p-3 flex w-3/5 justify-end">
           <Button
-            color="default"
-            variant="bordered"
-            className="text-lg border-1 mr-4 hover:bg-gray-300 transition hover:duration-500"
-            startContent={<CiLogout size={22} />}
+            color="danger"
+            className="text-lg"
+            startContent={<CiLogout size={25} />}
             onClick={logout}
           >
             Logout
           </Button>
         </div>
       </div>
-      <div className="flex w-full h-full">
-        <div className="basis-4/12 xl:basis-3/12 2xl:basis-2/12 bg-slate-100 border-t-1 border-gray-200 px-2">
-          <p className="font-semibold text-2xl text-center pt-5">
-            Applied Filters
-          </p>
-          <Divider className="my-4 bg-gray-300/60" />
+      <div className="flex flex-col bg-gray-400 rounded-2xl m-4 p-4">
+        <div className="flex">
           <Card className="p-4 m-4">
             <RadioGroup
               label="Select your preferred language"
-              color="primary"
+              color="secondary"
               value={userPreferences.country}
               name="country"
             >
@@ -213,28 +209,15 @@ export default function Home() {
           <Card className="p-4 m-4">
             <RadioGroup
               label="Select your preferred category"
-              color="primary"
+              color="secondary"
               value={userPreferences.category}
               name="category"
-              classNames={{ wrapper: "grid grid-cols-2" }}
             >
               <Radio value="science" onChange={handleRadioChange}>
                 Science
               </Radio>
               <Radio value="sports" onChange={handleRadioChange}>
                 Sports
-              </Radio>
-              <Radio
-                value="entertainment"
-                onChange={handleRadioChange}
-                classNames={{
-                  labelWrapper: "text-ellipsis overflow-hidden",
-                }}
-              >
-                Entertainment
-              </Radio>
-              <Radio value="technology" onChange={handleRadioChange}>
-                Technology
               </Radio>
               <Radio value="health" onChange={handleRadioChange}>
                 Health
@@ -247,7 +230,7 @@ export default function Home() {
           <Card className="p-4 m-4">
             <RadioGroup
               label="Select your preferred news source"
-              color="primary"
+              color="secondary"
               value={userPreferences.apiSource}
               name="apiSource"
             >
@@ -262,84 +245,72 @@ export default function Home() {
               </Radio>
             </RadioGroup>
           </Card>
-          <div className="px-4">
-            <Button fullWidth color="primary" onClick={handleSavePreferences}>
-              Save Preferences
-            </Button>
-          </div>
         </div>
-        <div className="flex-1 border-1 border-gray-200 pt-8 relative">
-          <div className="w-[300px] lg:w-[700px] md:w-[400px] mb-5 absolute left-1/2 2xl:left-1/4 transform -translate-x-1/2 top-0 -translate-y-1/2">
-            <Input
-              type="text"
-              placeholder="Search anything"
-              labelPlacement="outside"
-              startContent={<HiOutlineMagnifyingGlass />}
-              size="lg"
-              value={searchQuery}
-              classNames={{ inputWrapper: "border-1 bg-gray-50" }}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col h-full justify-between py-3 px-6 overflow-auto">
-            {isLoading ? (
-              <div className="flex h-full justify-center items-center text-center">
-                <Spinner size="lg" color="primary" />
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-                {currentNews.map((article, index) => {
-                  return (
-                    <Card
-                      key={index}
-                      className="flex flex-row h-[160px] min-w-xs"
-                    >
-                      <Image
-                        width={300}
-                        alt="news-image"
-                        className="object-cover h-[150px] p-3 rounded-3xl max-w-[200px]"
-                        src={
-                          article.urlToImage
-                            ? article.urlToImage
-                            : "newspaper.png"
-                        }
-                      />
-                      <CardBody className="flex pt-4 pb-3">
-                        <p className="h-[100px] line-clamp-4 text-ellipsis overflow-hidden">
-                          {article.title}
-                        </p>
-                        <div>
-                          <Divider />
-                          <Link
-                            className="pt-1"
-                            isExternal
-                            href={article.url}
-                            showAnchorIcon
-                          >
-                            Read more about it
-                          </Link>
-                        </div>
-                      </CardBody>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-            <div className="flex flex-col justify-center items-center pt-10 pb-5">
-              {newsData.length ? (
-                <Pagination
-                  size="lg"
-                  total={totalPages}
-                  onChange={(newPage) => {
-                    setCurrentPage(newPage);
-                  }}
-                  initialPage={currentPage}
-                />
-              ) : null}
-            </div>
-          </div>
+        <div className="">
+          <Button color="primary" onClick={handleSavePreferences}>
+            Save Preferences
+          </Button>
         </div>
       </div>
+      <div className="w-[700px] mb-5">
+        <Input
+          type="text"
+          placeholder="Search anything"
+          labelPlacement="outside"
+          startContent={<HiOutlineMagnifyingGlass />}
+          size="lg"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      {isLoading ? (
+        <div className="h-screen bg-slate-300 flex justify-center items-center text-center">
+          <Spinner size="lg" color="primary" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-5 gap-4 p-3 mb-10">
+          {currentNews.map((article, index) => {
+            return (
+              <Card key={index} className="max-w-[400px] max-h-[800px]">
+                <CardHeader className="flex gap-3 flex-row justify-center">
+                  {article.urlToImage ? (
+                    <Image
+                      src={article.urlToImage}
+                      width={300}
+                      alt="news-image"
+                      className="object-cover h-[150px]"
+                    />
+                  ) : (
+                    <HiOutlineNewspaper size={150} color="gray" />
+                  )}
+                </CardHeader>
+                <Divider />
+                <CardBody>
+                  <p className="h-[120px] line-clamp-5 text-ellipsis overflow-hidden">
+                    {article.title}
+                  </p>
+                </CardBody>
+                <Divider />
+                <CardFooter>
+                  <Link isExternal showAnchorIcon href={article.url}>
+                    Know more about it
+                  </Link>
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+      {newsData.length ? (
+        <Pagination
+          size="lg"
+          total={totalPages}
+          onChange={(newPage) => {
+            setCurrentPage(newPage);
+          }}
+          initialPage={currentPage}
+        />
+      ) : null}
     </div>
   );
 }

@@ -57,11 +57,11 @@ export default function SignUp() {
         />
       </div>
       <div className="w-2/5 p-12 bg-white h-screen flex flex-col justify-center text-start">
-        <div className="text-4xl font-semibold">Newsio 📰</div>
+        <Image width={250} alt="app-logo" src="logo.png" />
         <div className="text-xl font-light pt-7">Need an account?</div>
         <div className="text-lg text-gray-500 font-light pt-2">
           Please enter your information and dive deep into bright future of
-          Newsio.
+          spotlight.
         </div>
         <div className="flex flex-col flex-wrap md:flex-nowrap gap-4 pt-7">
           <Input

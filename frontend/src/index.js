@@ -14,7 +14,7 @@ root.render(
     <Router>
       <NextUIProvider>
         <App />
-        <ToastContainer />
+        <ToastContainer className={"rounded-lg"} />
       </NextUIProvider>
     </Router>
   </React.StrictMode>
