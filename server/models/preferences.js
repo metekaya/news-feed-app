@@ -5,8 +5,7 @@ const User = require("./user");
 const Preferences = sequelize.define("preferences", {
   country: Sequelize.STRING,
   category: Sequelize.STRING,
-  source: Sequelize.STRING,
-  author: Sequelize.STRING,
+  apiSource: Sequelize.STRING,
 });
 
 User.hasOne(Preferences);

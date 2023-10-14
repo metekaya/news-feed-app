@@ -33,6 +33,7 @@ export default function Home() {
   const [userPreferences, setUserPreferences] = useState({
     country: "",
     category: "",
+    apiSource: "",
   });
 
   const logout = () => {
@@ -49,22 +50,19 @@ export default function Home() {
     });
   };
 
-  console.log(newsData);
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const filterNewsByCriteria = useCallback(() => {
     return newsData.filter((article) => {
-      const { title, publishedAt, category, source } = article;
+      const { title, publishedAt, source, author } = article;
       return (
         (title && title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (author && author.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (publishedAt && publishedAt.includes(searchQuery)) ||
-        (category &&
-          category.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (source &&
-          source.name &&
-          source.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          source &&
+          source.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     });
   }, [newsData, searchQuery]);
@@ -81,6 +79,7 @@ export default function Home() {
           {
             country: userPreferences.country,
             category: userPreferences.category,
+            apiSource: userPreferences.apiSource,
           },
           {
             headers: {
@@ -125,15 +124,20 @@ export default function Home() {
 
   useEffect(() => {
     setIsLoading(true);
-    if (!userPreferences.country || !userPreferences.category) {
+    if (
+      !userPreferences.country ||
+      !userPreferences.category ||
+      !userPreferences.apiSource
+    ) {
       return;
     }
     axios
       .post(
-        "http://localhost:4000/topHeadlines",
+        "http://localhost:4000/merged-news",
         {
           country: userPreferences.country,
           category: userPreferences.category,
+          apiSource: userPreferences.apiSource,
         },
         {
           headers: {
@@ -152,7 +156,11 @@ export default function Home() {
           toast.error("Something went wrong.", { theme: "light" });
         }
       });
-  }, [userPreferences.country, userPreferences.category]);
+  }, [
+    userPreferences.country,
+    userPreferences.category,
+    userPreferences.apiSource,
+  ]);
 
   useEffect(() => {
     const updatedTotalPages = calculateTotalPages(filteredNews, itemsPerPage);
@@ -187,14 +195,14 @@ export default function Home() {
               value={userPreferences.country}
               name="country"
             >
+              <Radio value="en" onChange={handleRadioChange}>
+                English
+              </Radio>
               <Radio value="fr" onChange={handleRadioChange}>
-                France
+                French
               </Radio>
-              <Radio value="us" onChange={handleRadioChange}>
-                United States
-              </Radio>
-              <Radio value="tr" onChange={handleRadioChange}>
-                Türkiye
+              <Radio value="es" onChange={handleRadioChange}>
+                Spanish
               </Radio>
             </RadioGroup>
           </Card>
@@ -214,6 +222,27 @@ export default function Home() {
               <Radio value="health" onChange={handleRadioChange}>
                 Health
               </Radio>
+              <Radio value="general" onChange={handleRadioChange}>
+                General
+              </Radio>
+            </RadioGroup>
+          </Card>
+          <Card className="p-4 m-4">
+            <RadioGroup
+              label="Select your preferred news source"
+              color="secondary"
+              value={userPreferences.apiSource}
+              name="apiSource"
+            >
+              <Radio value="NewsAPI" onChange={handleRadioChange}>
+                The NewsAPI
+              </Radio>
+              <Radio value="GuardianAPI" onChange={handleRadioChange}>
+                The Guardian
+              </Radio>
+              <Radio value="all" onChange={handleRadioChange}>
+                All sources
+              </Radio>
             </RadioGroup>
           </Card>
         </div>
@@ -225,7 +254,7 @@ export default function Home() {
       </div>
       <div className="w-[700px] mb-5">
         <Input
-          type="email"
+          type="text"
           placeholder="Search anything"
           labelPlacement="outside"
           startContent={<HiOutlineMagnifyingGlass />}
@@ -272,14 +301,16 @@ export default function Home() {
           })}
         </div>
       )}
-      <Pagination
-        size="lg"
-        total={totalPages}
-        onChange={(newPage) => {
-          setCurrentPage(newPage);
-        }}
-        initialPage={currentPage}
-      />
+      {newsData.length ? (
+        <Pagination
+          size="lg"
+          total={totalPages}
+          onChange={(newPage) => {
+            setCurrentPage(newPage);
+          }}
+          initialPage={currentPage}
+        />
+      ) : null}
     </div>
   );
 }

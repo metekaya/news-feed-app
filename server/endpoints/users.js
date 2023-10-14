@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Constants } = require("../constants");
 const Preferences = require("../models/preferences");
+const sequelize = require("../connections/database");
 
 module.exports = {
   read: async function (req, res) {
@@ -41,6 +42,7 @@ module.exports = {
     const userId = req.user.id;
     const country = req.body.country;
     const category = req.body.category;
+    const apiSource = req.body.apiSource;
 
     console.log(`Saving user preferences for user: ${req.user.username}`);
 
@@ -48,6 +50,7 @@ module.exports = {
       const userPreferences = await Preferences.findOne({ where: { userId } });
       userPreferences.country = country;
       userPreferences.category = category;
+      userPreferences.apiSource = apiSource;
 
       await userPreferences.save();
       console.log("Successfully updated user preferences.");
@@ -59,6 +62,8 @@ module.exports = {
     }
   },
   create: async function (req, res) {
+    const transaction = await sequelize.transaction();
+
     const username = req.body.username;
     const password = req.body.password;
     console.log(`Starting to create user = ${username}`);
@@ -72,17 +77,31 @@ module.exports = {
         .status(400)
         .json({ OK: false, message: "Username is already in use" });
     }
-    console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
-      const newUser = await User.create({
-        username,
-        password: hashedPassword,
-      });
+      const newUser = await User.create(
+        {
+          username,
+          password: hashedPassword,
+        },
+        { transaction: transaction }
+      );
+
+      const userPreferences = await Preferences.create(
+        {
+          country: "en",
+          category: "general",
+          apiSource: "all",
+          userId: newUser.id,
+        },
+        { transaction: transaction }
+      );
+      await transaction.commit();
       console.log(`Successfully created new user = ${username}`);
       return res.json(newUser);
     } catch (error) {
+      await transaction.rollback();
       console.log(error);
       return res
         .status(500)

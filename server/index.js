@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/users", authenticateToken, users.readAllUsers);
-app.post("/topHeadlines", authenticateToken, news.topHeadlinesWithParams);
+app.post("/merged-news", authenticateToken, news.mergedNews);
 app.post("/sign-up", users.create);
 app.post("/login", users.login);
 app.get("/user/preferences", authenticateToken, users.readPreferences);
