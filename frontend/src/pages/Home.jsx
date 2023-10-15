@@ -186,12 +186,12 @@ export default function Home() {
           </Button>
         </div>
       </div>
-      <div className="flex w-full h-full">
+      <div className="flex flex-col md:flex-row w-full h-full">
         <div className="basis-4/12 xl:basis-3/12 2xl:basis-2/12 bg-slate-100 border-t-1 border-gray-200 px-2">
-          <p className="font-semibold text-2xl text-center pt-5">
+          <p className="font-semibold md:text-2xl text-lg text-center pt-2 md:pt-5">
             Applied Filters
           </p>
-          <Divider className="my-4 bg-gray-300/60" />
+          <Divider className="my-4 bg-gray-300/60 mt-2 md:mt-4" />
           <Card className="p-4 m-4">
             <RadioGroup
               label="Select your preferred language"
@@ -262,14 +262,14 @@ export default function Home() {
               </Radio>
             </RadioGroup>
           </Card>
-          <div className="px-4">
+          <div className="px-4 pb-3">
             <Button fullWidth color="primary" onClick={handleSavePreferences}>
               Save Preferences
             </Button>
           </div>
         </div>
-        <div className="flex-1 border-1 border-gray-200 pt-8 relative">
-          <div className="w-[300px] lg:w-[700px] md:w-[400px] mb-5 absolute left-1/2 2xl:left-1/4 transform -translate-x-1/2 top-0 -translate-y-1/2">
+        <div className="flex-1 border-1 border-gray-200 pt-6 relative">
+          <div className="w-full px-5 md:w-[400px] lg:w-[700px] xl:w-[1000px] mb-5 md:absolute left-1/2 md:transform md:-translate-x-1/2 md:top-0 md:-translate-y-1/2">
             <Input
               type="text"
               placeholder="Search anything"
@@ -288,44 +288,50 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-                {currentNews.map((article, index) => {
-                  return (
-                    <Card
-                      key={index}
-                      className="flex flex-row h-[160px] min-w-xs"
-                    >
-                      <Image
-                        width={300}
-                        alt="news-image"
-                        className="object-cover h-[150px] p-3 rounded-3xl max-w-[200px]"
-                        src={
-                          article.urlToImage
-                            ? article.urlToImage
-                            : "newspaper.png"
-                        }
-                      />
-                      <CardBody className="flex pt-4 pb-3">
-                        <p className="h-[100px] line-clamp-4 text-ellipsis overflow-hidden">
-                          {article.title}
-                        </p>
-                        <div>
-                          <Divider />
-                          <Link
-                            className="pt-1"
-                            isExternal
-                            href={article.url}
-                            showAnchorIcon
-                          >
-                            Read more about it
-                          </Link>
-                        </div>
-                      </CardBody>
-                    </Card>
-                  );
-                })}
+                {currentNews.length ? (
+                  currentNews.map((article, index) => {
+                    return (
+                      <Card
+                        key={index}
+                        className="flex flex-row h-[160px] min-w-xs"
+                      >
+                        <Image
+                          alt="news-image"
+                          className="md:w-[300px] w-[150px] object-cover h-[150px] p-3 rounded-3xl max-w-[200px]"
+                          src={
+                            article.urlToImage
+                              ? article.urlToImage
+                              : "newspaper.png"
+                          }
+                        />
+                        <CardBody className="flex pt-4 pb-3">
+                          <p className="h-[100px] line-clamp-4 text-ellipsis overflow-hidden">
+                            {article.title}
+                          </p>
+                          <div>
+                            <Divider />
+                            <Link
+                              className="pt-1"
+                              isExternal
+                              href={article.url}
+                              showAnchorIcon
+                            >
+                              Read more about it
+                            </Link>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    );
+                  })
+                ) : (
+                  <p>
+                    Couldn't find any news related to search query or applied
+                    filters.
+                  </p>
+                )}
               </div>
             )}
-            <div className="flex flex-col justify-center items-center pt-10 pb-5">
+            <div className="flex flex-col justify-center items-center pb-5">
               {newsData.length ? (
                 <Pagination
                   size="lg"

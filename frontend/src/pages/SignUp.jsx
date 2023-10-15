@@ -47,7 +47,7 @@ export default function SignUp() {
 
   return (
     <div className="h-screen bg-slate-300 flex font-spartan justify-center text-center">
-      <div className="w-3/5 bg-blue-50 h-screen flex justify-center items-center">
+      <div className="w-3/5 bg-blue-50 h-screen md:flex hidden justify-center items-center">
         <Image
           isBlurred
           isZoomed
@@ -56,7 +56,7 @@ export default function SignUp() {
           src="create-account.svg"
         />
       </div>
-      <div className="w-2/5 p-12 bg-white h-screen flex flex-col justify-center text-start">
+      <div className="md:w-2/5 w-full p-12 bg-white h-screen flex flex-col justify-center text-start">
         <Image width={250} alt="app-logo" src="logo.png" />
         <div className="text-xl font-light pt-7">Need an account?</div>
         <div className="text-lg text-gray-500 font-light pt-2">
