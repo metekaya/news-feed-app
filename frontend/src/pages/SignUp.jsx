@@ -1,10 +1,14 @@
-import axios from "axios";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+
+import { createAccount } from "../api/user";
+
+import SignUpSVG from "../assets/sign-up.svg";
+import AppLogo from "../assets/logo.png";
 
 import { Button, Image, Input } from "@nextui-org/react";
 import { HiEye, HiEyeSlash } from "react-icons/hi2";
-import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [user, setUser] = useState({
@@ -16,7 +20,7 @@ export default function SignUp() {
   const [isFormValid, setIsFormValid] = useState(true);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const navigate = useNavigate();
+  const navigateTo = useNavigate();
 
   const handleSignUp = () => {
     if (!user.username || !user.password || !user.confirm_password) {
@@ -28,20 +32,18 @@ export default function SignUp() {
       setIsFormValid(false);
       return;
     }
-    axios
-      .post("http://localhost:4000/sign-up", {
-        username: user.username,
-        password: user.password,
-      })
+    createAccount(user)
       .then((response) => {
         console.log(response);
-        navigate("/login");
+        navigateTo("/login");
       })
       .catch((error) => {
         console.log(error);
         if (error.request.status === 400) {
-          toast.error("Username already exists.", { theme: "light" });
+          toast.error("Username already exists.");
+          return;
         }
+        toast.error("Something went wrong when creating a new user.");
       });
   };
 
@@ -53,11 +55,11 @@ export default function SignUp() {
           isZoomed
           className="w-[600px]"
           alt="create-account-svg"
-          src="create-account.svg"
+          src={SignUpSVG}
         />
       </div>
       <div className="md:w-2/5 w-full p-12 bg-white h-screen flex flex-col justify-center text-start">
-        <Image width={250} alt="app-logo" src="logo.png" />
+        <Image width={250} alt="app-logo" src={AppLogo} />
         <div className="text-xl font-light pt-7">Need an account?</div>
         <div className="text-lg text-gray-500 font-light pt-2">
           Please enter your information and dive deep into bright future of

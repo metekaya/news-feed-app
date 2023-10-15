@@ -1,33 +1,30 @@
-import axios from "axios";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import { login } from "../api/user";
+
+import LoginSVG from "../assets/login.svg";
+import AppLogo from "../assets/logo.png";
 
 import { Button, Image, Input } from "@nextui-org/react";
 import { HiEye, HiEyeSlash } from "react-icons/hi2";
-import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const navigate = useNavigate();
+  const navigateTo = useNavigate();
   const [user, setUser] = useState({ username: "", password: "" });
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://localhost:4000/login", {
-        username: user.username,
-        password: user.password,
+    login(user)
+      .then((response) => {
+        navigateTo("/");
+      })
+      .catch((error) => {
+        toast.error("Something went wrong");
       });
-
-      console.log(response);
-      window.localStorage.setItem("token", response.data.token);
-
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong", { theme: "light" });
-    }
   };
 
   return (
@@ -38,11 +35,11 @@ export default function Login() {
           isZoomed
           className="w-[600px]"
           alt="newspaper-svg"
-          src="newspaper-bro.svg"
+          src={LoginSVG}
         />
       </div>
       <div className="md:w-2/5 w-full p-12 bg-white h-screen flex flex-col justify-center text-start">
-        <Image width={250} alt="app-logo" src="logo.png" />
+        <Image width={250} alt="app-logo" src={AppLogo} />
         <div className="text-xl font-light pt-7">Welcome to spotlight 🔦</div>
         <div className="text-lg text-gray-500 font-light pt-2">
           Please sign-in to your account and start the future of personalized

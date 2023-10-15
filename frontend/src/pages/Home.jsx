@@ -1,22 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
+import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
+import { CiLogout } from "react-icons/ci";
+
 import {
   Button,
   Card,
-  CardBody,
   Divider,
   Image,
   Input,
-  Link,
   Pagination,
   Radio,
   RadioGroup,
   Spinner,
 } from "@nextui-org/react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 
-import { CiLogout } from "react-icons/ci";
+import AppLogo from "../assets/logo.png";
+import {
+  calculateTotalPages,
+  filterNewsByCriteria,
+  logOut,
+} from "../utils/utils";
+import { getPreferences, updatePreferences } from "../api/user";
+import { getFilteredNews } from "../api/news";
+import NewsCard from "../components/NewsCard";
 
 export default function Home() {
   const [newsData, setNewsData] = useState([]);
@@ -34,13 +42,7 @@ export default function Home() {
     apiSource: "",
   });
 
-  const logout = () => {
-    window.localStorage.removeItem("token");
-    window.location.reload();
-  };
-
   const handleRadioChange = (event) => {
-    console.log("event name: ", event);
     const { name, value } = event.target;
     setUserPreferences({
       ...userPreferences,
@@ -48,75 +50,36 @@ export default function Home() {
     });
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  const filterNewsByCriteria = useCallback(() => {
-    return newsData.filter((article) => {
-      const { title, publishedAt, source, author } = article;
-      return (
-        (title && title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (author && author.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (publishedAt && publishedAt.includes(searchQuery)) ||
-        (source &&
-          source &&
-          source.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    });
+  const filterNews = useCallback(() => {
+    return filterNewsByCriteria(newsData, searchQuery);
   }, [newsData, searchQuery]);
 
-  function calculateTotalPages(filteredNews, itemsPerPage) {
-    return Math.ceil(filteredNews.length / itemsPerPage);
-  }
-
-  const handleSavePreferences = async () => {
+  const handleSavePreferences = () => {
     try {
-      await axios
-        .post(
-          "http://localhost:4000/user/preferences",
-          {
-            country: userPreferences.country,
-            category: userPreferences.category,
-            apiSource: userPreferences.apiSource,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${window.localStorage.getItem("token")}`,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response);
-          toast.success("Successfully updated user preferences", {
-            theme: "light",
-          });
-        });
+      updatePreferences(userPreferences).then((response) => {
+        toast.success("Successfully updated user preferences");
+      });
     } catch (error) {
-      console.error("Error updating user preferences:", error);
-      toast.error("Error updating user preferences", { theme: "light" });
+      toast.error("Something went wrong when updating user preferences");
     }
   };
 
-  const filteredNews = filterNewsByCriteria(newsData, searchQuery);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
+  const filteredNews = filterNews(newsData, searchQuery);
   const currentNews = filteredNews.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     setIsLoading(true);
-    axios
-      .get("http://localhost:4000/user/preferences", {
-        headers: {
-          Authorization: `Bearer ${window.localStorage.getItem("token")}`,
-        },
-      })
+    getPreferences()
       .then((response) => {
         setUserPreferences(response.data);
         setIsLoading(false);
       })
-      .catch((preferencesError) => {
+      .catch((error) => {
         setIsLoading(false);
-        console.error("Error fetching user preferences:", preferencesError);
-        toast.error("Preferences retrieval failed", { theme: "light" });
+        toast.error("Could not get user preferences.");
       });
   }, []);
 
@@ -129,36 +92,16 @@ export default function Home() {
     ) {
       return;
     }
-    axios
-      .post(
-        "http://localhost:4000/merged-news",
-        {
-          country: userPreferences.country,
-          category: userPreferences.category,
-          apiSource: userPreferences.apiSource,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${window.localStorage.getItem("token")}`,
-          },
-        }
-      )
+    getFilteredNews(userPreferences)
       .then((response) => {
-        console.log(response);
         setNewsData(response.data);
         setIsLoading(false);
       })
       .catch((error) => {
         setIsLoading(false);
-        if (error.request.status === 400) {
-          toast.error("Something went wrong.", { theme: "light" });
-        }
+        toast.error("Something went wrong when retrieving news.");
       });
-  }, [
-    userPreferences.country,
-    userPreferences.category,
-    userPreferences.apiSource,
-  ]);
+  }, [userPreferences]);
 
   useEffect(() => {
     const updatedTotalPages = calculateTotalPages(filteredNews, itemsPerPage);
@@ -173,16 +116,16 @@ export default function Home() {
       <div className="flex-1 bg-blue-100/60 h-[120px]">
         <div className="flex justify-between items-center px-2 py-3">
           <div className="basis-4/12 xl:basis-3/12 2xl:basis-2/12 flex justify-center">
-            <Image width={250} alt="app-logo" src="logo.png" />
+            <Image width={250} alt="app-logo" src={AppLogo} />
           </div>
           <Button
             color="default"
             variant="bordered"
             className="text-lg border-1 mr-4 hover:bg-gray-300 transition hover:duration-500"
             startContent={<CiLogout size={22} />}
-            onClick={logout}
+            onClick={logOut}
           >
-            Logout
+            Log out
           </Button>
         </div>
       </div>
@@ -290,38 +233,7 @@ export default function Home() {
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 {currentNews.length ? (
                   currentNews.map((article, index) => {
-                    return (
-                      <Card
-                        key={index}
-                        className="flex flex-row h-[160px] min-w-xs"
-                      >
-                        <Image
-                          alt="news-image"
-                          className="md:w-[300px] w-[150px] object-cover h-[150px] p-3 rounded-3xl max-w-[200px]"
-                          src={
-                            article.urlToImage
-                              ? article.urlToImage
-                              : "newspaper.png"
-                          }
-                        />
-                        <CardBody className="flex pt-4 pb-3">
-                          <p className="h-[100px] line-clamp-4 text-ellipsis overflow-hidden">
-                            {article.title}
-                          </p>
-                          <div>
-                            <Divider />
-                            <Link
-                              className="pt-1"
-                              isExternal
-                              href={article.url}
-                              showAnchorIcon
-                            >
-                              Read more about it
-                            </Link>
-                          </div>
-                        </CardBody>
-                      </Card>
-                    );
+                    return <NewsCard article={article} index={index} />;
                   })
                 ) : (
                   <p>
@@ -331,7 +243,7 @@ export default function Home() {
                 )}
               </div>
             )}
-            <div className="flex flex-col justify-center items-center pb-5">
+            <div className="flex flex-col justify-center items-center py-5">
               {newsData.length ? (
                 <Pagination
                   size="lg"
