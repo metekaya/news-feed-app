@@ -132,7 +132,7 @@ module.exports = {
         { id: user.id, username: user.username },
         Constants.secretKey,
         {
-          expiresIn: "1h",
+          expiresIn: "3d",
         }
       );
 
