@@ -1,5 +1,10 @@
-# Spotlight • Personalized News Feed App(interview task)
-
+<h1 align="center">
+    <a href="http://localhost:3000/" target="blank_">
+        <img height="100" alt="HTTPie" src="/frontend/src/assets/logo-transparent.png" />
+    </a>
+    <br>
+    Spotlight • Personalized News Feed App(interview task)
+</h1>
 Welcome to Spotlight! This application aims to provide users with a personalized news experience tailored to their interests and preferences, with a user friendly UI.
 
 ## Features
@@ -9,6 +14,12 @@ Welcome to Spotlight! This application aims to provide users with a personalized
 - **Save Preferences**: You can save your desired preferences and they'll be loaded when you login.
 - **User-Friendly Interface**: Enjoy a clean and intuitive user interface for seamless navigation and reading.
 
+
+## Prerequisites
+
+Before you begin, ensure that you have met the following requirements:
+
+- You have installed Node.js. If not, you can download it from [here](https://nodejs.org/).
 
 ## Installation
 
@@ -46,4 +57,4 @@ If you have any questions, suggestions, or feedback, please feel free to reach o
 
 ---
 
-Thank you for using the Personalized News Feed App! I hope you enjoy your personalized news experience.
+Thank you for using the Spotlight! I hope you enjoy your personalized news experience.
