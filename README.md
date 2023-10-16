@@ -1,6 +1,6 @@
 <h1 align="center">
     <a href="http://localhost:3000/" target="blank_">
-        <img height="100" alt="HTTPie" src="/frontend/src/assets/logo-transparent.png" />
+        <img height="120" alt="HTTPie" src="/frontend/src/assets/logo-transparent.png" />
     </a>
     <br>
     Spotlight • Personalized News Feed App(interview task)
@@ -31,7 +31,7 @@ Before you begin, ensure that you have met the following requirements:
 3. Run the `frontend`:\
 ```npm run start```
 4. Open a new terminal or split the current one (`Ctrl+Shift+5` on VS Code) and navigate to the `server` folder and install the necessary dependencies:\
-```cd server```\
+```cd ../server```\
 ```npm install```
 5. Copy the `config.example.json` file and rename it to `config.json` in the `server` folder:
 
@@ -53,7 +53,7 @@ Before you begin, ensure that you have met the following requirements:
 
 ## Contact
 
-If you have any questions, suggestions, or feedback, please feel free to reach out to me at [metekaya55@gmail.com](mailto:your-email@example.com)
+If you have any questions, suggestions, or feedback, please feel free to reach out to me at [metekaya55@gmail.com](mailto:metekaya55@gmail.com)
 
 ---
 
