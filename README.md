@@ -3,7 +3,7 @@
         <img height="120" alt="HTTPie" src="/frontend/src/assets/logo-transparent.png" />
     </a>
     <br>
-    Spotlight • Personalized News Feed App(interview task)
+    Spotlight • Personalized News Feed App
 </h1>
 Welcome to Spotlight! This application aims to provide users with a personalized news experience tailored to their interests and preferences, with a user friendly UI.
 
